@@ -1,0 +1,20 @@
+dataset:
+  root_path: public/input
+
+agent:
+  model: YOUR_MODEL_NAME
+  api_base: YOUR_OPENAI_COMPATIBLE_API_BASE
+  api_key: ${DABENCH_API_KEY}
+  max_steps: 16
+  temperature: 0.0
+
+harness:
+  mode: raw
+  prompt_version: react-v1
+  semantic_model_version: unversioned
+
+run:
+  output_dir: artifacts/runs
+  run_id:
+  max_workers: 1
+  task_timeout_seconds: 600

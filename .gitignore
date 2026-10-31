@@ -1,0 +1,28 @@
+# Local credentials and machine-specific configuration
+.env
+.env.*
+!.env.example
+*.local.yaml
+*.local.yml
+
+# Python and local tooling caches
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.uv-cache/
+.venv/
+.idea/
+official-dataspace/
+
+# Generated run outputs and local metadata
+artifacts/
+artifacts/runs/
+public/input/
+public/output/
+data/dataspace-supported5/input/
+data/dataspace-supported5/output/
+data/dataspace-supported5/evaluation/
+deliverables/*.zip
+.idea/
+.DS_Store

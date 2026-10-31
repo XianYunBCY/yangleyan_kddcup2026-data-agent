@@ -1,0 +1,69 @@
+id: superhero
+version: superhero-v1
+description: Superhero identities and governed superpower relationships across SQLite, CSV, and JSON.
+match:
+  required_paths:
+    - db/superhero.db
+    - csv/hero_power.csv
+    - json/superpower.json
+
+sources:
+  superheroes:
+    kind: sqlite
+    path: db/superhero.db
+    relation: superhero
+    alias: T1
+    primary_key:
+      - id
+  hero_powers:
+    kind: csv
+    path: csv/hero_power.csv
+    alias: T2
+    primary_key:
+      - hero_id
+      - power_id
+  superpowers:
+    kind: json
+    path: json/superpower.json
+    relation: superpower
+    alias: T3
+    primary_key:
+      - id
+
+dimensions:
+  hero.id:
+    source: superheroes
+    expression: T1.id
+    data_type: integer
+    output_label: id
+    description: Unique superhero identifier.
+  hero.name:
+    source: superheroes
+    expression: T1.superhero_name
+    data_type: string
+    output_label: superhero_name
+    description: Commonly known superhero name.
+  power.id:
+    source: superpowers
+    expression: T3.id
+    data_type: integer
+    output_label: power_id
+    description: Unique superpower identifier.
+  power.name:
+    source: superpowers
+    expression: T3.power_name
+    data_type: string
+    output_label: power_name
+    description: Governed superpower name, such as Death Touch.
+
+metrics: {}
+
+joins:
+  - left: superheroes
+    right: hero_powers
+    condition: T1.id = T2.hero_id
+    relationship: one_to_many
+  - left: hero_powers
+    right: superpowers
+    condition: T2.power_id = T3.id
+    relationship: many_to_one

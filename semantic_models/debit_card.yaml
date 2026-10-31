@@ -1,0 +1,65 @@
+id: debit_card
+version: debit-card-v1
+description: Debit card customer consumption analytics.
+match:
+  required_paths:
+    - db/customers.db
+    - csv/yearmonth.csv
+
+sources:
+  customers:
+    kind: sqlite
+    path: db/customers.db
+    relation: customers
+    alias: T1
+    primary_key:
+      - CustomerID
+  monthly_consumption:
+    kind: csv
+    path: csv/yearmonth.csv
+    alias: T2
+    primary_key:
+      - CustomerID
+      - Date
+
+dimensions:
+  customer.id:
+    source: customers
+    expression: T1.CustomerID
+    data_type: integer
+    description: Unique customer identifier.
+  customer.segment:
+    source: customers
+    expression: T1.Segment
+    data_type: string
+    description: Customer segment such as SME, LAM, or KAM.
+  customer.currency:
+    source: customers
+    expression: T1.Currency
+    data_type: string
+    description: Customer payment currency.
+  consumption.month:
+    source: monthly_consumption
+    expression: T2.Date
+    data_type: integer
+    description: Calendar month encoded as YYYYMM.
+  consumption.year:
+    source: monthly_consumption
+    expression: CAST(SUBSTR(CAST(T2.Date AS VARCHAR), 1, 4) AS INTEGER)
+    data_type: integer
+    description: Calendar year derived from the YYYYMM month value.
+
+metrics:
+  debit_card.average_monthly_consumption:
+    sources:
+      - monthly_consumption
+    expression: AVG(T2.Consumption ORDER BY T2.CustomerID, T2.Date) / 12
+    data_type: number
+    output_label: AVG(T2.Consumption) / 12
+    description: Benchmark-governed average monthly consumption, calculated as average consumption divided by 12.
+
+joins:
+  - left: customers
+    right: monthly_consumption
+    condition: T1.CustomerID = T2.CustomerID
+    relationship: one_to_many
